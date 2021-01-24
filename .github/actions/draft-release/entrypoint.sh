@@ -2,7 +2,7 @@
 
 set -euxo pipefail
 
-# set up a git user
+# Set up a git user
 git config user.name "release[bot]"
 git config user.email "actions@users.noreply.github.com"
 
@@ -29,20 +29,20 @@ touch temp-changes.txt
 # Write the changelog
 sed -i "${INSERTPOINT} r temp-changes.txt" CHANGELOG.md
 
-# cleanup
+# Cleanup
 rm temp-changes.txt
 
-# run prettier (to ensure the markdown file doesn't fail CI)
+# Run prettier (to ensure the markdown file doesn't fail CI)
 npm ci
 npm run prettier
 
-# commit + push changelog
+# Commit + push changelog
 git checkout -b "$RELEASENAME"
 git add CHANGELOG.md
 git commit -m "Update Changelog"
 git push origin "$RELEASENAME"
 
-# submit a PR
+# Submit a PR
 TITLE="Changelog for Release $RELEASENAME"
 PR_RESP=$(curl https://api.github.com/repos/"$REPO_NAME"/pulls \
     -X POST \
@@ -51,7 +51,7 @@ PR_RESP=$(curl https://api.github.com/repos/"$REPO_NAME"/pulls \
     --data '{"title": "'"$TITLE"'", "body": "'"$TITLE"'", "head": "'"$RELEASENAME"'", "base": "master"}')
 echo "$PR_RESP"
 
-# add the 'release' label to the PR
+# Add the 'release' label to the PR
 PR_API_URL=$(echo "$PR_RESP" | jq ._links.issue.href)
 curl "$PR_API_URL" \
     -X POST \

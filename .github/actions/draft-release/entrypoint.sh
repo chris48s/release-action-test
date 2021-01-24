@@ -6,8 +6,7 @@ set -euxo pipefail
 git config user.name "release[bot]"
 git config user.email "actions@users.noreply.github.com"
 
-git status
-git tag
+git fetch --unshallow --tags
 
 # Last server-YYYY-MM-DD tag
 LASTTAG=$(git tag | grep server | tail -n 1)

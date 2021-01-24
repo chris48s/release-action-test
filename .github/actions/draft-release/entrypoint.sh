@@ -2,6 +2,10 @@
 
 set -euxo pipefail
 
+# set up a git user
+git config user.name "release[bot]"
+git config user.email "actions@users.noreply.github.com"
+
 # Last server-YYYY-MM-DD tag
 LASTTAG=$(git tag | grep server | tail -n 1)
 
@@ -31,10 +35,6 @@ rm temp-changes.txt
 # run prettier (to ensure the markdown file doesn't fail CI)
 npm ci
 npm run prettier
-
-# set up a git user
-git config user.name "release[bot]"
-git config user.email "actions@users.noreply.github.com"
 
 # commit + push changelog
 git checkout -b "$RELEASENAME"

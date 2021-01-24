@@ -8,27 +8,27 @@ git config user.email "actions@users.noreply.github.com"
 
 # Find last server-YYYY-MM-DD tag
 git fetch --unshallow --tags
-LASTTAG=$(git tag | grep server | tail -n 1)
+LAST_TAG=$(git tag | grep server | tail -n 1)
 
 # Find the marker in CHANGELOG.md
-INSERTPOINT=$(grep -n "^\-\-\-$" CHANGELOG.md | cut -f1 -d:)
-INSERTPOINT=$((INSERTPOINT+1))
+INSERT_POINT=$(grep -n "^\-\-\-$" CHANGELOG.md | cut -f1 -d:)
+INSERT_POINT=$((INSERT_POINT+1))
 
 # Generate a release name
-RELEASENAME="server-$(date --rfc-3339=date)"
+RELEASE_NAME="server-$(date --rfc-3339=date)"
 
 # Assemble changelog entry
 rm -f temp-changes.txt
 touch temp-changes.txt
 {
-    echo "## $RELEASENAME"
+    echo "## $RELEASE_NAME"
     echo ""
-    git log "$LASTTAG"..HEAD --no-merges --oneline --pretty="format:- %s" --perl-regexp --author='^((?!dependabot).*)$'
+    git log "$LAST_TAG"..HEAD --no-merges --oneline --pretty="format:- %s" --perl-regexp --author='^((?!dependabot).*)$'
     echo $'\n'
 } >> temp-changes.txt
 
 # Write the changelog
-sed -i "${INSERTPOINT} r temp-changes.txt" CHANGELOG.md
+sed -i "${INSERT_POINT} r temp-changes.txt" CHANGELOG.md
 
 # Cleanup
 rm temp-changes.txt
@@ -37,19 +37,21 @@ rm temp-changes.txt
 npm ci
 npm run prettier
 
+# Generate a unique branch name
+BRANCH_NAME="$RELEASE_NAME"-$(uuidgen | head -c 8)
+git checkout -b "$BRANCH_NAME"
+
 # Commit + push changelog
-BRANCHNAME="$RELEASENAME"-$(uuidgen | head -c 8)
-git checkout -b "$BRANCHNAME"
 git add CHANGELOG.md
 git commit -m "Update Changelog"
-git push origin "$BRANCHNAME"
+git push origin "$BRANCH_NAME"
 
 # Submit a PR
-TITLE="Changelog for Release $RELEASENAME"
+TITLE="Changelog for Release $RELEASE_NAME"
 PR_RESP=$(curl https://api.github.com/repos/"$REPO_NAME"/pulls \
     -X POST \
     -H "Authorization: token $GITHUB_TOKEN" \
-    --data '{"title": "'"$TITLE"'", "body": "'"$TITLE"'", "head": "'"$BRANCHNAME"'", "base": "master"}')
+    --data '{"title": "'"$TITLE"'", "body": "'"$TITLE"'", "head": "'"$BRANCH_NAME"'", "base": "master"}')
 
 # Add the 'release' label to the PR
 PR_API_URL=$(echo "$PR_RESP" | jq -r ._links.issue.href)

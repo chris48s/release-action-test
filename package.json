@@ -1,0 +1,24 @@
+{
+  "name": "release-action-test",
+  "version": "0.0.0",
+  "private": true,
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prettier": "prettier --write \"**/*.@(js|ts|tsx|md|json|yml)\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/chris48s/release-action-test.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/chris48s/release-action-test/issues"
+  },
+  "homepage": "https://github.com/chris48s/release-action-test#readme",
+  "devDependencies": {
+    "prettier": "^2.2.1"
+  }
+}

@@ -22,7 +22,7 @@ jobs:
       - name: Checkout branch "master"
         uses: actions/checkout@v2
         with:
-          ref: 'master'
+          ref: "master"
 
       - name: Tag Release
         uses: tvdias/github-tagger@v0.0.2

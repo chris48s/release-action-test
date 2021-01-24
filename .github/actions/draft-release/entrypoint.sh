@@ -49,14 +49,11 @@ TITLE="Changelog for Release $RELEASENAME"
 PR_RESP=$(curl https://api.github.com/repos/"$REPO_NAME"/pulls \
     -X POST \
     -H "Authorization: token $GITHUB_TOKEN" \
-    --include \
     --data '{"title": "'"$TITLE"'", "body": "'"$TITLE"'", "head": "'"$RELEASENAME"'", "base": "master"}')
-echo "$PR_RESP"
 
 # Add the 'release' label to the PR
 PR_API_URL=$(echo "$PR_RESP" | jq ._links.issue.href)
 curl "$PR_API_URL" \
     -X POST \
     -H "Authorization: token $GITHUB_TOKEN" \
-    --include \
     --data '{"labels":["release"]}'

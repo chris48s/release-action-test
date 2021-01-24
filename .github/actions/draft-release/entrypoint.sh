@@ -2,4 +2,4 @@
 
 set -euxo pipefail
 
-echo "$REPO_URL"
+echo "$REPO_NAME"

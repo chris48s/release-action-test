@@ -6,9 +6,8 @@ set -euxo pipefail
 git config user.name "release[bot]"
 git config user.email "actions@users.noreply.github.com"
 
+# Find last server-YYYY-MM-DD tag
 git fetch --unshallow --tags
-
-# Last server-YYYY-MM-DD tag
 LASTTAG=$(git tag | grep server | tail -n 1)
 
 # Find the marker in CHANGELOG.md
@@ -39,17 +38,18 @@ npm ci
 npm run prettier
 
 # Commit + push changelog
-git checkout -b "$RELEASENAME"
+BRANCHNAME="$RELEASENAME"-$(uuidgen | head -c 8)
+git checkout -b "$BRANCHNAME"
 git add CHANGELOG.md
 git commit -m "Update Changelog"
-git push origin "$RELEASENAME"
+git push origin "$BRANCHNAME"
 
 # Submit a PR
 TITLE="Changelog for Release $RELEASENAME"
 PR_RESP=$(curl https://api.github.com/repos/"$REPO_NAME"/pulls \
     -X POST \
     -H "Authorization: token $GITHUB_TOKEN" \
-    --data '{"title": "'"$TITLE"'", "body": "'"$TITLE"'", "head": "'"$RELEASENAME"'", "base": "master"}')
+    --data '{"title": "'"$TITLE"'", "body": "'"$TITLE"'", "head": "'"$BRANCHNAME"'", "base": "master"}')
 
 # Add the 'release' label to the PR
 PR_API_URL=$(echo "$PR_RESP" | jq -r ._links.issue.href)
